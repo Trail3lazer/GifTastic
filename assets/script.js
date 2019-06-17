@@ -12,7 +12,7 @@ var lastIdx = function () { return (topics.length - 1); };
 var buttonAppend = function (index) {
     let offset = 5
     var btn = $("<button>");
-    btn.addClass("btn-info m-2 rounded");
+    btn.addClass("btn-success m-2 rounded");
     $(btn).attr("id", "topic");
     let prop;
     let obj = topics[index]
