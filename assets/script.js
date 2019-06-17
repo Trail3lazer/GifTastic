@@ -10,19 +10,44 @@ var lastIdx = function () { return (topics.length - 1); };
 
 
 var buttonAppend = function (index) {
-        var btn = $("<button>");
-        btn.addClass("btn-info m-2 rounded");
-        $(btn).attr("id", index);
-        let prop;
-        let obj = topics[index]
-        for (prop in obj) {
-            $(btn).attr(prop, $(obj).prop(prop));
+    let offset = 5
+    var btn = $("<button>");
+    btn.addClass("btn-info m-2 rounded");
+    $(btn).attr("id", "topic");
+    let prop;
+    let obj = topics[index]
+    for (prop in obj) {
+        $(btn).attr(prop, $(obj).prop(prop));
+    }
+    $(btn).html(obj.name);
+    $("#buttonHolder").append(btn);
+    $(btn).click(function () {
+        $("#gifHolder").empty()
+        for (let i = 0; i < 5; i++) {
+            let gif = $("<img>")
+            $(gif).attr("src", $(this).attr("data-gifUrl-" + i));
+            $("#gifHolder").append(gif);
         }
-        $(btn).html(obj.name);
-        $("#buttonHolder").append(btn);
-        $(btn).click(function () {
-            console.log($(this).attr("data"));
+        let more = $('<button type="button" id="more" class="btn btn-warning btn-lg">Click for more!</button>');
+        $(more).click(function () {
+            let howMany = 5;
+            offset = offset + 5;
+            $.ajax({
+                url: "https://api.giphy.com/v1/gifs/search?api_key=LK8gIICujEEO0FeSDdtIK1lyPySGR32D&q=" + obj.name + "&limit=" + howMany + "&offset=" + offset + "&rating=G&lang=en",
+                data: "data",
+                method: "GET",
+                success: function (response) {
+                    for (let j = 0; j < response.data.length; j++) {
+                        let gif = $("<img>");
+                        $(gif).attr("src", response.data[j].images.fixed_width.url);
+                        $("#gifHolder").append(gif);
+                    }
+                }
+            });
+
         });
+        $("#moreButtonHolder").html(more);
+    });
 };
 
 var gifFinder = function (index) {
@@ -32,7 +57,7 @@ var gifFinder = function (index) {
         method: "GET",
         success: function (response) {
             for (let j = 0; j < response.data.length; j++) {
-                let gifObj = response.data[j].images.downsized_large.url;
+                let gifObj = response.data[j].images.fixed_width.url;
                 topics[index]["data-gifUrl-" + j] = gifObj;
             }
             buttonAppend(index);
