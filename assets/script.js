@@ -1,49 +1,58 @@
 var topics = [
-    { name: "Snowboarding" },
-    {
-        name: "Star Wars",
-    }, { name: "Coding" }, { name: "Mountaineering" }, { name: "Baby Animals" }, { name: "Street Racing" }, { name: "Financial Independance" }]
+    { "name": "Snowboarding" },
+    { 'name': "Star Wars" },
+    { 'name': "Coding" },
+    { 'name': "Mountaineering" },
+    { 'name': "Baby Animals" },
+    { 'name': "Street Racing" },
+    { 'name': "Financial Independance" }]
+var lastIdx = function () { return (topics.length - 1); };
 
 
-for (var i = 0; i < topics.length; i++) {
+var buttonAppend = function (index) {
+        var btn = $("<button>");
+        btn.addClass("btn-info m-2 rounded");
+        $(btn).attr("id", index);
+        let prop;
+        let obj = topics[index]
+        for (prop in obj) {
+            $(btn).attr(prop, $(obj).prop(prop));
+        }
+        $(btn).html(obj.name);
+        $("#buttonHolder").append(btn);
+        $(btn).click(function () {
+            console.log($(this).attr("data"));
+        });
+};
+
+var gifFinder = function (index) {
     $.ajax({
-        url: "https://api.giphy.com/v1/gifs/search?api_key=LK8gIICujEEO0FeSDdtIK1lyPySGR32D&q=" + topics[i].name + "&limit=5&offset=0&rating=G&lang=en",
+        url: "https://api.giphy.com/v1/gifs/search?api_key=LK8gIICujEEO0FeSDdtIK1lyPySGR32D&q=" + topics[index].name + "&limit=5&offset=0&rating=G&lang=en",
         data: "data",
         method: "GET",
         success: function (response) {
-            console.log(response);
             for (let j = 0; j < response.data.length; j++) {
-                const gifObj = response.data[j].images.downsized_large.url;
-                // topics[i] === undefined?????? WHYYYYY
-                topics[i]["data-gifUrl" + j] = gifObj;
-
+                let gifObj = response.data[j].images.downsized_large.url;
+                topics[index]["data-gifUrl-" + j] = gifObj;
             }
+            buttonAppend(index);
         }
     });
 
+};
 
+for (var topicsIndex = 0; topicsIndex < topics.length; topicsIndex++) {
+    gifFinder(topicsIndex);
 }
 
-var buttonAppend = function (i) {
-    var btn = $("<button>");
-    btn.addClass("btn-info m-2 rounded");
-    btn.attr("id", i.name);
-    for (var prop in this) {
-        if (prop.includes("https")) {
-            btn.attr("data-gifUrl", "PLACEHOLDER");
-        }
-    }
-    btn.text(i.name);
-    $("#buttonHolder").append(btn);
-    $("#" + topics[i].name).click(function () {
-        console.log(this.attr("id"));
-    });
-}
+var newTopic = function () {
+    let newTopic = { 'name': $('#searchBar').val() };
+    topics.push(newTopic);
+    gifFinder(lastIdx());
+};
 
 $("#searchButton").click(function () {
-    buttonAppend(topics[-1]);
+    newTopic(lastIdx());
 });
-
-
 
 
